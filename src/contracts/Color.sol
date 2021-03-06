@@ -1,7 +1,22 @@
-pragma solidity 0.5.0;
+pragma solidity 0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721Full.sol"
+import "./ERC721.sol";
+import "./ERC721Enumerable.sol";
+import "./ERC721Metadata.sol";
 
-contract Color {
+contract Color is ERC721, ERC721Enumerable, ERC721Metadata {
+  string[] public colors;
+  mapping(string => bool) _colorExists;
+
+  constructor() ERC721Full("Color", "COLOR") public {
+  }
+
+  // E.G. color = "#FFFFFF"
+  function mint(string memory _color) public {
+    require(!_colorExists[_color]);
+    uint _id = colors.push(_color);
+    _mint(msg.sender, _id);
+    _colorExists[_color] = true;
+  }
 
 }
