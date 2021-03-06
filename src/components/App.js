@@ -393,16 +393,38 @@ class App extends Component {
             }
         ]
         const address = '0xCED4435B92dc32Cc25D35693748eBfc8A42D09D8'
-        const myContract = new web3.eth.Contract(abi, address)
-        console.log(myContract);
+        const contract = new web3.eth.Contract(abi, address)
+        this.setState({ contract })
+        const totalSupply = await contract.methods.totalSupply().call()
+        this.setState({ totalSupply })
+            //Load colors
+        for (var i = 1; i <= totalSupply; i++) {
+            const color = await contract.methods.colors(i - 1).call()
+            this.setState({
+                colors: [...this.state.colors, color]
+            })
+        }
+        console.log(this.state.colors)
 
+    }
 
+    mint = (color) => {
+      console.log(color)
+      this.state.contract.methods.mint(color).send({ from: this.state.account })
+      .once('receipt', (receipt) => {
+        this.setState({
+          colors: [...this.state.colors, color]
+        })
+      })
     }
 
     constructor(props) {
         super(props)
         this.state = {
-            account: ''
+            account: '',
+            contract: null,
+            totalSupply: 0,
+            colors: []
         }
     }
 
@@ -424,28 +446,50 @@ class App extends Component {
             <
             small className = "text-white" > < span id = "account" > { this.state.account } < /span></small >
             <
-            /li> <
-            /ul> <
+            /li> < /
+            ul > <
             /nav> <
             div className = "container-fluid mt-5" >
             <
             div className = "row" >
             <
             main role = "main"
-            className = "col-lg-12 d-flex text-center" >
-            <
-            div className = "content mr-auto ml-auto" > { /*Form goes here*/ } <
-            /div> <
-            /main> <
-            /div> <
-            hr / >
-            <
-            div className = "row text-center" >
-            <
-            p > Tokens go here... < /p> <
-            /div> <
-            /div> <
-            /div>
+            className = "col-lg-12 d-flex text-center">
+            <div className = "content mr-auto ml-auto">
+            <h1>Emitir Token</h1> 
+            <form onSubmit={(event)=>{
+              event.preventDefault()
+              const color = this.color.value
+              this.mint(color)
+            }}>
+             <input 
+               type='text'
+               className='form-control mb-1'
+               placeholder='ejemplo #FFFFFF'
+               ref={(input)=>{ this.color = input }}
+              />
+              <input 
+               type='submit'
+               className='btn btn-block btn-primary'
+               value='Crear'
+              />
+            </form>
+            </div> 
+            </main> 
+            </div>
+            <hr/>
+            <div className = "row text-center">
+            {this.state.colors.map((color, key)=>{
+             return(
+                <div key={key} className="col-md-3 mb-3">
+                 <div className="token" style={{ backgroundColor: color }}></div>
+                 <div>{color}</div>
+                </div>
+              )
+            })}
+            </div> 
+            </div> 
+            </div >
         );
     }
 }
