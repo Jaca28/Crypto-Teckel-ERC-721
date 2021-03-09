@@ -1,10 +1,8 @@
-pragma solidity 0.8.0;
+pragma solidity 0.5.0;
 
-import "./ERC721.sol";
-import "./ERC721Enumerable.sol";
-import "./ERC721Metadata.sol";
+import "./ERC721Full.sol";
 
-contract Color is ERC721, ERC721Enumerable, ERC721Metadata {
+contract Color is ERC721Full {
   string[] public colors;
   mapping(string => bool) _colorExists;
 
